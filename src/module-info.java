@@ -6,5 +6,4 @@ module GUIProject {
 
     opens hust.soict.globalict.javafx to javafx.fxml;
     exports hust.soict.globalict.javafx;
-    exports hust.soict.globalict.swing;
 }
