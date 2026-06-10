@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="file://$JAVAFX21$" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$JAVAFX21$" recursive="false" />
+  </library>
+</component>
