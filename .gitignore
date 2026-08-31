@@ -1,0 +1,11 @@
+# java class
+
+*.class
+out
+
+# python cache
+__pycache__
+
+# image.png
+image.png
+

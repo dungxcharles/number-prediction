@@ -2,8 +2,11 @@ import torch
 from torch import nn
 from torchvision import transforms
 from PIL import Image
-import sys
 import PIL.ImageOps
+import io
+
+from fastapi import FastAPI, Request
+import uvicorn
 
 class NeuralNetwork(nn.Module):
     def __init__(self):
@@ -21,13 +24,13 @@ class NeuralNetwork(nn.Module):
         x = self.flatten(x)
         return self.linear_relu_stack(x)
 
-def predict(image_path):
-    model = NeuralNetwork()
-    model.load_state_dict(torch.load("mnist_mlp.params", weights_only=True))
-    model.eval()
+model = NeuralNetwork()
+model.load_state_dict(torch.load("mnist_mlp.params", weights_only=True))
+model.eval()
 
+def predict(image_bytes):
     try:
-        image = Image.open(image_path)
+        image = Image.open(io.BytesIO(image_bytes))
 
         if image.mode != 'RGB':
             image = image.convert('RGB')
@@ -36,7 +39,7 @@ def predict(image_path):
         # Grayscale TRƯỚC khi xử lý bounding box
         gray_image = image.convert('L')
 
-        # Ngưỡng 128 thay vì 50
+        # Ngưỡng 128
         bw_image = gray_image.point(lambda x: 0 if x < 128 else 255, '1')
         bbox = bw_image.getbbox()
 
@@ -59,7 +62,7 @@ def predict(image_path):
             transforms.Grayscale(num_output_channels=1),  # an toàn nếu chưa phải L
             transforms.Resize((28, 28), interpolation=transforms.InterpolationMode.LANCZOS),
             transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))  # ← quan trọng nhất
+            transforms.Normalize((0.1307,), (0.3081,))
         ])
 
         tensor_img = transform(image).unsqueeze(0)
@@ -68,14 +71,28 @@ def predict(image_path):
             logits = model(tensor_img)
             predicted_class = logits.argmax(1).item()
 
-        print(predicted_class)
+        return predicted_class
 
     except Exception as e:
         print(f"Error: {e}")
+        return -1
+
+app = FastAPI()
+
+@app.post("/process-image")
+async def process_image(request: Request):
+    print("Receiving request...")
+
+    image_bytes = await request.body()
+
+    print(f"Processing image ...")
+
+    processing_result = predict(image_bytes)
+
+    return {
+        "result": processing_result
+    }
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        img_path = sys.argv[1]
-        predict(img_path)
-    else:
-        print("Please provide image path")
+    uvicorn.run("server:app", host="127.0.0.1", port=5000, reload=True)
+
