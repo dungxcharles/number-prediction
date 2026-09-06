@@ -5,7 +5,8 @@ from PIL import Image
 import PIL.ImageOps
 import io
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 class NeuralNetwork(nn.Module):
@@ -78,20 +79,31 @@ def predict(image_bytes):
         return -1
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/process-image")
-async def process_image(request: Request):
+async def process_image(image: UploadFile = File(...)):
     print("Receiving request...")
 
-    image_bytes = await request.body()
+    try:
+        image_bytes = await image.read()
 
-    print(f"Processing image ...")
+        print(f"Processing image ...")
 
-    processing_result = predict(image_bytes)
+        processing_result = predict(image_bytes)
 
-    return {
-        "result": processing_result
-    }
+        return {
+            "result": processing_result
+        }
+    except Exception as e:
+        print("An error has occured")
+        return {"error": str(e)}
 
 if __name__ == "__main__":
     uvicorn.run("server:app", host="127.0.0.1", port=5000, reload=True)
