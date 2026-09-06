@@ -1,5 +1,6 @@
 const canvas = document.getElementById("myCanvas");
-const button = document.getElementById("clearButton");
+const clearButton = document.getElementById("clearButton");
+const predictButton = document.getElementById("predictButton");
 const ctx = canvas.getContext("2d");
 
 let isDragging = false;
@@ -27,12 +28,21 @@ canvas.addEventListener("mousemove", function (event){
         console.log(`You click (${x},${y})`);
 
         ctx.beginPath();
-        ctx.arc(x,y,5,0,Math.PI * 2);
+        ctx.arc(x,y,8,0,Math.PI * 2);
         ctx.fillStyle = "#000000";
         ctx.fill();
     }
 }); 
 
-button.addEventListener("click", function (){
+clearButton.addEventListener("click", function (){
     ctx.clearRect(0,0,canvas.width, canvas.height);
 });
+
+predictButton.addEventListener("click", function(){
+
+});
+
+// Export image
+function exportImg(){
+    
+}
