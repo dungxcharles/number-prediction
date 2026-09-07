@@ -2,11 +2,16 @@ const canvas = document.getElementById("myCanvas");
 const clearButton = document.getElementById("clearButton");
 const predictButton = document.getElementById("predictButton");
 const ctx = canvas.getContext("2d");
+const resultDiv = document.getElementById("resultDiv");
+const resultNb = document.getElementById("resultNb");
+
+// initializations
 ctx.fillStyle = "#ffffff";
 ctx.fillRect(0,0,canvas.width, canvas.height);
 
 let isDragging = false;
 
+// add listeners
 canvas.addEventListener("mousedown", function(){
     isDragging = true;
 });
@@ -25,8 +30,6 @@ canvas.addEventListener("mousemove", function (event){
         const x = (event.clientX - rect.left) * scaleX;
         const y = (event.clientY - rect.top) * scaleY;
 
-
-
         console.log(`You click (${x},${y})`);
 
         ctx.beginPath();
@@ -39,6 +42,10 @@ canvas.addEventListener("mousemove", function (event){
 clearButton.addEventListener("click", function (){
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0,0,canvas.width, canvas.height);
+
+    if (!resultDiv.classList.contains("hidden")){
+        resultDiv.classList.toggle("hidden");
+    }
 });
 
 predictButton.addEventListener("click", function(){
@@ -54,6 +61,12 @@ predictButton.addEventListener("click", function(){
 
             const result = await response.json();
             console.log("Prediction result:", result);
+
+            resultNb.textContent = result.result;
+            if (resultDiv.classList.contains("hidden")){
+                resultDiv.classList.toggle("hidden");
+            }
+
         } catch (err) {
             console.error("Error occurs: " + err);
         }

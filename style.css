@@ -23,5 +23,13 @@ body{
         gap: 10px;
         width: 120px;
         height: 60px;
-    } 
+    }
+    #resultDiv{
+        color:rgb(255, 0, 0);
+        font-weight: 600;
+    }
+
+    .hidden{
+        display: none;
+    }
 }
